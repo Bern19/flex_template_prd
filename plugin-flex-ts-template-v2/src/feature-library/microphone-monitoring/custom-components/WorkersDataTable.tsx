@@ -1,6 +1,7 @@
 import React from 'react';
 import { Badge, Box } from '@twilio-paste/core';
 import type { WorkerAttributes } from '@twilio/flex-ui';
+
 import { getBusinessUnit } from '../config';
 
 interface MicEnabledWorkerAttributes extends WorkerAttributes {
@@ -32,13 +33,16 @@ const MicStatusColumn: React.FC<MicStatusColumnProps> = ({ worker }) => {
   const micStatus = attributes.mic;
   const micLastChanged = attributes.micLastChanged;
 
-  const business_units = getBusinessUnit()
+  const business_units = getBusinessUnit();
 
   if (attributes.business_unit && !business_units.includes(attributes.business_unit)) {
     return null;
-  } else if ((attributes.business_unit && business_units.includes(attributes.business_unit)) ||
-    (!attributes.business_unit || attributes.business_unit === "" || attributes.business_unit === undefined)) {
-
+  } else if (
+    (attributes.business_unit && business_units.includes(attributes.business_unit)) ||
+    !attributes.business_unit ||
+    attributes.business_unit === '' ||
+    attributes.business_unit === undefined
+  ) {
     if (!micStatus || !micLastChanged) {
       return (
         <Box padding="space20">
@@ -58,14 +62,14 @@ const MicStatusColumn: React.FC<MicStatusColumnProps> = ({ worker }) => {
         </Badge>
       </Box>
     );
-  } else {
-    return (<Box padding="space10" minWidth="180px">
-              <Badge as="span" variant="neutral">
-                No Data
-              </Badge>
-            </Box>)
   }
+  return (
+    <Box padding="space10" minWidth="180px">
+      <Badge as="span" variant="neutral">
+        No Data
+      </Badge>
+    </Box>
+  );
 };
 
 export default MicStatusColumn;
-
