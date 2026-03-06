@@ -8,4 +8,3 @@ export const eventHook = (flex: typeof Flex, _manager: Flex.Manager, task: Flex.
   logger.info(`[ucc-transfer-to-s3] Task accepted: ${task.sid}`);
   console.log('task+++++', task);
 };
-

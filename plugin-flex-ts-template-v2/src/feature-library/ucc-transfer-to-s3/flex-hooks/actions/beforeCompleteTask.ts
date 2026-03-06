@@ -52,4 +52,3 @@ export const actionHook = function beforeCompleteTask(flex: typeof Flex, _manage
     console.log('AFTER OBJECT ', task);
   });
 };
-

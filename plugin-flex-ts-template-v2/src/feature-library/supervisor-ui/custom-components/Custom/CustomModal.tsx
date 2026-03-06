@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalFooterActions,
-  ModalHeader,
-  ModalHeading
-} from '@twilio-paste/core/modal';
+import { Modal, ModalBody, ModalFooter, ModalFooterActions, ModalHeader, ModalHeading } from '@twilio-paste/core/modal';
 import { Button } from '@twilio-paste/core/button';
 
 interface CustomModalProps {
@@ -22,15 +15,10 @@ export const CustomModal: React.FC<CustomModalProps> = ({
   onClose,
   onConfirm,
   title = 'Confirmation',
-  content
+  content,
 }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      onDismiss={onClose}
-      ariaLabelledby="custom-modal-heading"
-      size="default"
-    >
+    <Modal isOpen={isOpen} onDismiss={onClose} ariaLabelledby="custom-modal-heading" size="default">
       <ModalHeader>
         <ModalHeading as="h3" id="custom-modal-heading">
           {title}

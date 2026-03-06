@@ -45,17 +45,7 @@ Add the following to your `ui_attributes` to enable the feature:
         "smart": ["+63960", "+63963", "+63968"],
         "dito": ["+63895", "+63896", "+63897"]
       },
-      "business_unit_caller_ids": {
-        "BUSINESS_UNIT_NAME": {
-          "globeCallerIds": ["+63XXXXXXXXXX"],
-          "smartCallerIds": ["+63XXXXXXXXXX"],
-          "landlineCallerIds": ["+63XXXXXXXXXX"],
-          "landlineCebuCallerIds": ["+63XXXXXXXXXX"],
-          "ditoCallerIds": ["+63XXXXXXXXXX"],
-          "internationalCallerIds": ["+63XXXXXXXXXX"],
-          "customCallerIds": ["+63XXXXXXXXXX"]  // You can add custom caller ID groups
-        }
-      },
+      "business_unit_caller_ids_url": "https://your-domain.com/path/to/business_unit_caller_ids.json"
     }
   }
 }
@@ -89,9 +79,12 @@ This will generate SIP URIs like: `sip:number@address;edge=singapore;secure=true
   - `callerIdGroup`: Which caller ID group to use from business unit configuration
   - `priority`: Order to check prefixes (higher numbers checked first)
 - `carrier_prefixes`: (object) Mapping of carrier names to their number prefixes
-- `business_unit_caller_ids`: (object) Mapping of business units to their caller ID configurations
+- `business_unit_caller_ids`: (object, optional) Mapping of business units to their caller ID configurations
   - Each business unit can have any number of caller ID groups
   - Groups are referenced by the `callerIdGroup` in number_types
+- `business_unit_caller_ids_url`: (string, optional) URL that returns a JSON object in the same shape as `business_unit_caller_ids`
+  - If provided, this URL is fetched at call time and its result is used
+  - If the fetch fails, the plugin falls back to the inline `business_unit_caller_ids` configuration (if present)
 
 ## Dynamic Number Types
 
@@ -117,6 +110,18 @@ The feature supports fully dynamic number types and caller ID groups:
   "business_unit_caller_ids": {
     "BUSINESS_UNIT": {
       "newCarrierCallerIds": ["+63XXXXXXXXXX"]
+    }
+  }
+}
+```
+
+Alternatively, you can host this same JSON object remotely and reference it via `business_unit_caller_ids_url`:
+
+```json
+{
+  "features": {
+    "outbound_caller_id": {
+      "business_unit_caller_ids_url": "https://your-domain.com/path/to/business_unit_caller_ids.json"
     }
   }
 }
