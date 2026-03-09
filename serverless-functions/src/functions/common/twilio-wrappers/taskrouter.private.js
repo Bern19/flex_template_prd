@@ -229,28 +229,42 @@ exports.updateWorkerAttributes = async function updateWorkerAttributes(parameter
   if (!isString(attributesUpdate))
     throw new Error('Invalid parameters object passed. Parameters must contain attributes Json string');
 
-  const worker = await twilioExecute(context, (client) =>
-    client.taskrouter.v1.workspaces(process.env.TWILIO_FLEX_WORKSPACE_SID).workers(workerSid).fetch(),
-  );
+  const workerContextURL = `https://taskrouter.${getRegionUrl()}/v1/Workspaces/${
+    process.env.TWILIO_FLEX_WORKSPACE_SID
+  }/Workers/${workerSid}`;
 
-  if (!worker.success) {
-    return {
-      success: false,
-      status: 400,
-    };
-  }
-
-  const newAttributes = {
-    ...JSON.parse(worker.data.attributes),
-    ...JSON.parse(attributesUpdate),
+  const config = {
+    auth: {
+      username: process.env.ACCOUNT_SID,
+      password: process.env.AUTH_TOKEN,
+    },
   };
 
-  return twilioExecute(context, (client) =>
-    client.taskrouter.v1
-      .workspaces(process.env.TWILIO_FLEX_WORKSPACE_SID)
-      .workers(workerSid)
-      .update({ attributes: JSON.stringify(newAttributes) }),
-  );
+  return executeWithRetry(context, async () => {
+    // We use axios here to access the ETag header for optimistic concurrency control.
+    const getResponse = await axios.get(workerContextURL, config);
+    let worker = getResponse.data;
+    worker.attributes = JSON.parse(getResponse.data.attributes);
+    worker.revision = JSON.parse(getResponse.headers.etag);
+
+    const updatedWorkerAttributes = omitBy(merge({}, worker.attributes, JSON.parse(attributesUpdate)), isNil);
+
+    config.headers = {
+      'If-Match': worker.revision,
+      'content-type': 'application/x-www-form-urlencoded',
+    };
+
+    const postData = new URLSearchParams({
+      Attributes: JSON.stringify(updatedWorkerAttributes),
+    });
+
+    worker = (await axios.post(workerContextURL, postData, config)).data;
+
+    return {
+      ...worker,
+      attributes: JSON.parse(worker.attributes),
+    };
+  });
 };
 
 /**

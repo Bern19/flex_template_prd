@@ -1,5 +1,7 @@
 import type { Manager as FlexManager, WorkerAttributes } from '@twilio/flex-ui';
 
+import TaskRouterService from '../../../utils/serverless/TaskRouter/TaskRouterService';
+
 const CONFIG = {
   SESSION_KEY: 'mic_session_data',
   LAST_ACTIVE_KEY: 'mic_last_active',
@@ -291,22 +293,23 @@ class MicrophoneMonitorService {
       return Promise.reject(new Error('Worker client not available'));
     }
 
-    const currentAttributes = (workerClient.attributes ?? {}) as WorkerAttributeUpdate;
     const updatedAttributes: WorkerAttributeUpdate = {
-      ...currentAttributes,
       mic: micStatus,
       micTimestamp: Date.now(),
       micLastChanged: new Date().toLocaleString(),
     };
 
-    return workerClient
-      .setAttributes(updatedAttributes as WorkerAttributes)
-      .then((attributes) => {
-        console.log(`Worker attribute updated: mic = ${micStatus}`);
-        return attributes;
+    return TaskRouterService.updateWorkerAttributesObject(workerClient.sid, updatedAttributes)
+      .then((success) => {
+        if (!success) {
+          throw new Error('Failed to update worker attributes (serverless returned success=false)');
+        }
+        console.log(`Worker attribute updated (TaskRouterService): mic = ${micStatus}`);
+        // Keep return type compatible: return latest known attributes merged with update.
+        return { ...(workerClient.attributes ?? {}), ...updatedAttributes } as WorkerAttributes;
       })
       .catch((error: unknown) => {
-        console.error('Failed to update worker attributes:', error);
+        console.error('Failed to update worker attributes via TaskRouterService:', error);
         throw error;
       });
   }
