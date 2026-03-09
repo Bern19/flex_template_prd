@@ -57,6 +57,8 @@ class TaskRouterService extends ApiService {
 
   private STORAGE_KEY = `pending_task_updates_${this.instanceSid}`;
 
+  private WORKER_STORAGE_KEY = `pending_worker_updates_${this.instanceSid}`;
+
   addToLocalStorage(taskSid: string, attributesUpdate: object): void {
     const storageValue = localStorage.getItem(this.STORAGE_KEY);
     let storageObject = {} as { [taskSid: string]: any };
@@ -113,6 +115,57 @@ class TaskRouterService extends ApiService {
 
     if (changed) {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(storageObject));
+    }
+  }
+
+  addWorkerToLocalStorage(workerSid: string, attributesUpdate: object): void {
+    const storageValue = localStorage.getItem(this.WORKER_STORAGE_KEY);
+    let storageObject = {} as { [workerSid: string]: any };
+
+    if (storageValue) {
+      storageObject = JSON.parse(storageValue);
+    }
+
+    if (!storageObject[workerSid]) {
+      storageObject[workerSid] = {};
+    }
+
+    storageObject[workerSid] = merge({}, storageObject[workerSid], attributesUpdate);
+
+    localStorage.setItem(this.WORKER_STORAGE_KEY, JSON.stringify(storageObject));
+  }
+
+  fetchWorkerFromLocalStorage(workerSid: string): any {
+    const storageValue = localStorage.getItem(this.WORKER_STORAGE_KEY);
+    let storageObject = {} as { [workerSid: string]: any };
+
+    if (storageValue) {
+      storageObject = JSON.parse(storageValue);
+    }
+
+    if (!storageObject[workerSid]) {
+      storageObject[workerSid] = {};
+    }
+
+    return storageObject[workerSid];
+  }
+
+  removeWorkerFromLocalStorage(workerSid: string): void {
+    const storageValue = localStorage.getItem(this.WORKER_STORAGE_KEY);
+    let storageObject = {} as { [workerSid: string]: any };
+    let changed = false;
+
+    if (storageValue) {
+      storageObject = JSON.parse(storageValue);
+    }
+
+    if (storageObject[workerSid]) {
+      delete storageObject[workerSid];
+      changed = true;
+    }
+
+    if (changed) {
+      localStorage.setItem(this.WORKER_STORAGE_KEY, JSON.stringify(storageObject));
     }
   }
 
@@ -185,6 +238,30 @@ class TaskRouterService extends ApiService {
 
   async updateWorkerAttributes(workerSid: string, attributesUpdate: string): Promise<boolean> {
     const result = await this.#updateWorkerAttributes(workerSid, attributesUpdate);
+    return result.success;
+  }
+
+  async updateWorkerAttributesObject(
+    workerSid: string,
+    attributesUpdate: object,
+    deferUpdates: boolean = false,
+  ): Promise<boolean> {
+    if (deferUpdates) {
+      this.addWorkerToLocalStorage(workerSid, attributesUpdate);
+      return true;
+    }
+
+    const mergedAttributesUpdate = merge({}, this.fetchWorkerFromLocalStorage(workerSid), attributesUpdate);
+    if (Object.keys(mergedAttributesUpdate).length < 1) {
+      return true;
+    }
+
+    const result = await this.#updateWorkerAttributes(workerSid, JSON.stringify(mergedAttributesUpdate));
+
+    if (result.success) {
+      this.removeWorkerFromLocalStorage(workerSid);
+    }
+
     return result.success;
   }
 
