@@ -23,25 +23,15 @@ export interface CarrierPrefixes {
   [carrier: string]: string[];
 }
 
-export interface SelectOption {
-  value: string;
-  label: string;
-}
-
-export interface SelectConfig {
-  type: 'select';
-  value: string;
-  options: SelectOption[];
-}
-
 export interface OutboundCallerIdConfig {
   enabled: boolean;
-  sip_address?: string | SelectConfig;
+  sip_address?: string;
   sip_config?: SipConfiguration;
   default_caller_id?: string;
   number_types?: NumberTypeConfig[];
   carrier_prefixes?: CarrierPrefixes;
   business_unit_caller_ids?: BusinessUnitCallerIds;
+  business_unit_caller_ids_url?: string;
 }
 
 export default OutboundCallerIdConfig;
