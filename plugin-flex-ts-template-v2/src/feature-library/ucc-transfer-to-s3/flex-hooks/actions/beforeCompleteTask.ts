@@ -24,4 +24,3 @@ export const actionHook = function beforeAcceptTask(flex: typeof Flex, _manager:
     console.log("Recording in Progress ", payload)
   });
 };
-
