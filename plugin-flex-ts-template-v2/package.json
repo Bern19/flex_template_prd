@@ -22,7 +22,7 @@
         "@emoji-mart/react": "^1.1.1",
         "@twilio-paste/core": "^17.7.0",
         "@twilio-paste/icons": "^9.4.3",
-        "@twilio/flex-plugin": "7.1.0",
+        "@twilio/flex-plugin": "^7.1.0",
         "array-move": "^4.0.0",
         "emoji-mart": "5.5.2",
         "filepond": "^4.32.12",
