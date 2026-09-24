@@ -11,6 +11,9 @@ export const actionHook = function beforeAcceptTask(flex: typeof Flex, _manager:
     const { task } = payload;
     const { attributes } = task;
 
+    const accountSid = _manager.serviceConfiguration.account_sid;
+    console.log(accountSid);
+
     logger.info(`[ucc-transfer-to-s3] Before complete task: ${task.sid}`);
     console.log('TASK++++++', payload);
     console.log('attributes+++++++++', attributes);
@@ -19,7 +22,7 @@ export const actionHook = function beforeAcceptTask(flex: typeof Flex, _manager:
   const key = payload.sid;
 
     payload.conferenceOptions.record = "true";
-    payload.conferenceOptions.recordingStatusCallback = `https://ywiftwrekh.execute-api.ap-southeast-1.amazonaws.com/uat/twi-pd-send-to-zadara?key=${key}`
+    payload.conferenceOptions.recordingStatusCallback = `https://ywiftwrekh.execute-api.ap-southeast-1.amazonaws.com/uat/twi-pd-send-to-zadara?key=${key}&sid=${accountSid}`
 
     console.log("Recording in Progress ", payload)
   });
