@@ -8,15 +8,11 @@ export const eventName = FlexEvent.taskAccepted;
 export const eventHook = (flex: typeof Flex, _manager: Flex.Manager, task: Flex.ITask) => {
   logger.info(`[ucc-transfer-to-s3] Task accepted: ${task.sid}`);
   console.log('taskaccepted+++++', task);
-
-
   logger.info(`[ucc-transfer-to-s3] Before complete task: ${task.sid}`);
   console.log('attributes+++++++++', task.attributes);
 
   // Extract the key from conference participants
   const key = task.attributes?.conference?.participants?.worker;
-
-  
 
   if (!key) {
     logger.warn(`[ucc-transfer-to-s3] No worker participant key found for task: ${task.sid}`);

@@ -1,7 +1,6 @@
 import * as Flex from '@twilio/flex-ui';
 
 import { FlexActionEvent, FlexAction } from '../../../../types/feature-loader';
-import { getLambdaLink } from '../../config';
 import logger from '../../../../utils/logger';
 
 export const actionEvent = FlexActionEvent.before;
@@ -10,7 +9,6 @@ export const actionHook = function beforeAcceptTask(flex: typeof Flex, _manager:
   flex.Actions.addListener(`${actionEvent}${actionName}`, async (payload) => {
     const { task } = payload;
     const { attributes } = task;
-
     const accountSid = _manager.serviceConfiguration.account_sid;
     console.log(accountSid);
 
@@ -19,11 +17,11 @@ export const actionHook = function beforeAcceptTask(flex: typeof Flex, _manager:
     console.log('attributes+++++++++', attributes);
 
     // Extract the key from conference participants
-  const key = payload.sid;
+    const key = payload.sid;
 
-    payload.conferenceOptions.record = "true";
-    payload.conferenceOptions.recordingStatusCallback = `https://92kv46709f.execute-api.ap-southeast-1.amazonaws.com/prod/saverecordings?key=${key}&sid=${accountSid}`
+    payload.conferenceOptions.record = 'true';
+    payload.conferenceOptions.recordingStatusCallback = `https://92kv46709f.execute-api.ap-southeast-1.amazonaws.com/prod/saverecordings?key=${key}&sid=${accountSid}`;
 
-    console.log("Recording in Progress ", payload)
+    console.log('Recording in Progress ', payload);
   });
 };
